@@ -106,8 +106,29 @@ func addBook(w http.ResponseWriter, r *http.Request) {
 
 func updateBook(w http.ResponseWriter, r *http.Request) {
 	log.Println("Updates the book...")
+	var book Book
+	json.NewDecoder(r.Body).Decode(&book)
+
+	result, err := db.Exec("update books set title =$1, author = $2, year = $3 where id =$4 RETURNING id",
+		&book.Title, &book.Author, &book.Year, &book.ID)
+	logFatal(err)
+
+	rowsUpdated, err := result.RowsAffected()
+	logFatal(err)
+
+	json.NewEncoder(w).Encode(rowsUpdated)
 }
 
 func deleteBook(w http.ResponseWriter, r *http.Request) {
 	log.Println("Deletes the book...")
+	params := mux.Vars(r)
+
+	result, err := db.Exec("delete from books where id = $1", params["id"])
+	logFatal(err)
+
+	rowsDeleted, err := result.RowsAffected()
+	logFatal(err)
+
+	json.NewEncoder(w).Encode(rowsDeleted)
+
 }
