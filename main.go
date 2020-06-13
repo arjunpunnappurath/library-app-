@@ -1,6 +1,7 @@
 package main
 
 import (
+	"arjun/library/models"
 	"database/sql"
 	"encoding/json"
 	"log"
@@ -12,14 +13,7 @@ import (
 	"github.com/subosito/gotenv"
 )
 
-type Book struct {
-	ID     int    `json:id`
-	Title  string `json:title`
-	Author string `json:author`
-	Year   string `json:year`
-}
-
-var books []Book
+var books []models.Book
 
 var db *sql.DB
 
@@ -59,8 +53,8 @@ func main() {
 func viewBooks(w http.ResponseWriter, r *http.Request) {
 	log.Println("Displays the books...")
 
-	var book Book
-	books := []Book{}
+	var book models.Book
+	books := []models.Book{}
 
 	rows, err := db.Query("select * from books")
 	logFatal(err)
@@ -77,7 +71,7 @@ func viewBooks(w http.ResponseWriter, r *http.Request) {
 
 func viewBook(w http.ResponseWriter, r *http.Request) {
 	log.Println("Displays the specific book...")
-	var book Book
+	var book models.Book
 	params := mux.Vars(r)
 
 	rows := db.QueryRow("select * from books where id = $1", params["id"])
@@ -90,7 +84,7 @@ func viewBook(w http.ResponseWriter, r *http.Request) {
 
 func addBook(w http.ResponseWriter, r *http.Request) {
 	log.Println("adds a book...")
-	var book Book
+	var book models.Book
 	var bookID int
 	json.NewDecoder(r.Body).Decode(&book)
 
@@ -106,7 +100,7 @@ func addBook(w http.ResponseWriter, r *http.Request) {
 
 func updateBook(w http.ResponseWriter, r *http.Request) {
 	log.Println("Updates the book...")
-	var book Book
+	var book models.Book
 	json.NewDecoder(r.Body).Decode(&book)
 
 	result, err := db.Exec("update books set title =$1, author = $2, year = $3 where id =$4 RETURNING id",
