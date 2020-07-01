@@ -56,15 +56,11 @@ func (c Controller) AddBook(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("adds a book...")
 		var book models.Book
-		var bookID int
+
 		json.NewDecoder(r.Body).Decode(&book)
 
-		log.Println(book)
-
-		err := db.QueryRow("insert into books(title,author,year) values ($1,$2,$3)RETURNING id;",
-			book.Title, book.Author, book.Year).Scan(&bookID)
-
-		logFatal(err)
+		repo := repo.Repo{}
+		bookID := repo.AddBook(db, book)
 
 		json.NewEncoder(w).Encode(bookID)
 	}
@@ -76,12 +72,8 @@ func (c Controller) UpdateBook(db *sql.DB) http.HandlerFunc {
 		var book models.Book
 		json.NewDecoder(r.Body).Decode(&book)
 
-		result, err := db.Exec("update books set title =$1, author = $2, year = $3 where id =$4 RETURNING id",
-			&book.Title, &book.Author, &book.Year, &book.ID)
-		logFatal(err)
-
-		rowsUpdated, err := result.RowsAffected()
-		logFatal(err)
+		repo := repo.Repo{}
+		rowsUpdated := repo.UpdatesBook(db, book)
 
 		json.NewEncoder(w).Encode(rowsUpdated)
 	}
