@@ -3,6 +3,8 @@ This is a sample library application that is developed using GO as a preliminary
 This application has different modules that does its own respective jobs but is mainly confined to the idea of book managements and
 no subsequent major moudles like a User profile is incorporated which can be done in the subsequent iterations.
 
+Here the appication demonstrates the solid principles effectively and can be used as a reference to start writing simple apis in Golang for beginners.
+
 This application uses a Postgres db which is hosted with the help of Elephantsql which is maintained in cloud. 
 
 
