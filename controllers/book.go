@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"arjun/library/models"
+	"arjun/library/repo"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -23,20 +25,8 @@ func logFatal(err error) {
 func (c Controller) ViewBooks(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Displays the books...")
-
-		var book models.Book
-		books := []models.Book{}
-
-		rows, err := db.Query("select * from books")
-		logFatal(err)
-
-		defer rows.Close()
-
-		for rows.Next() {
-			err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Year)
-			logFatal(err)
-		}
-
+		repo := repo.Repo{}
+		books := repo.ViewAllBooks(db)
 		json.NewEncoder(w).Encode(books)
 	}
 }
@@ -44,14 +34,20 @@ func (c Controller) ViewBooks(db *sql.DB) http.HandlerFunc {
 func (c Controller) ViewBook(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Displays the specific book...")
-		var book models.Book
+		//var book models.Book
 		params := mux.Vars(r)
+		id := params["id"]
 
-		rows := db.QueryRow("select * from books where id = $1", params["id"])
+		fmt.Println(id)
 
-		err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Year)
-		logFatal(err)
+		repo := repo.Repo{}
+		book := repo.ViewSingleBook(db, id)
+		// rows := db.QueryRow("select * from books where id = $1", params["id"])
 
+		// err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Year)
+		// logFatal(err)
+
+		// json.NewEncoder(w).Encode(book)
 		json.NewEncoder(w).Encode(book)
 	}
 }
