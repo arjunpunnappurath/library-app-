@@ -83,13 +83,10 @@ func (c Controller) DeleteBook(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Deletes the book...")
 		params := mux.Vars(r)
+		id := params["id"]
 
-		result, err := db.Exec("delete from books where id = $1", params["id"])
-		logFatal(err)
-
-		rowsDeleted, err := result.RowsAffected()
-		logFatal(err)
-
+		repo := repo.Repo{}
+		rowsDeleted := repo.DeletesBook(db, id)
 		json.NewEncoder(w).Encode(rowsDeleted)
 
 	}

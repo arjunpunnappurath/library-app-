@@ -35,11 +35,6 @@ func (r *Repo) ViewAllBooks(db *sql.DB) []models.Book {
 
 func (r *Repo) ViewSingleBook(db *sql.DB, id string) models.Book {
 	var book models.Book
-
-	// rows := db.QueryRow("select * from books where id = $1", params["id"])
-
-	// err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Year)
-	// logFatal(err)
 	rows := db.QueryRow("select * from books where id = $1", id)
 	err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Year)
 	logFatal(err)
@@ -73,4 +68,15 @@ func (r *Repo) UpdatesBook(db *sql.DB, book models.Book) int64 {
 	logFatal(err)
 
 	return rowsUpdated
+}
+
+func (r *Repo) DeletesBook(db *sql.DB, id string) int64 {
+
+	result, err := db.Exec("delete from books where id = $1", id)
+	logFatal(err)
+
+	rowsDeleted, err := result.RowsAffected()
+	logFatal(err)
+
+	return rowsDeleted
 }
