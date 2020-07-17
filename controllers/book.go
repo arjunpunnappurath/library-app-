@@ -4,12 +4,8 @@ import (
 	"arjun/library/models"
 	"arjun/library/repo"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
-
-	"github.com/gorilla/mux"
 )
 
 type Controller struct{}
@@ -42,28 +38,16 @@ func (c Controller) AddBook(book models.Book, db *sql.DB) int {
 	return bookID
 }
 
-func (c Controller) UpdateBook(db *sql.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Updates the book...")
-		var book models.Book
-		json.NewDecoder(r.Body).Decode(&book)
+func (c Controller) UpdateBook(book models.Book, db *sql.DB) int64 {
+	repo := repo.Repo{}
+	rowsUpdated := repo.UpdatesBook(db, book)
 
-		repo := repo.Repo{}
-		rowsUpdated := repo.UpdatesBook(db, book)
-
-		json.NewEncoder(w).Encode(rowsUpdated)
-	}
+	return rowsUpdated
 }
 
-func (c Controller) DeleteBook(db *sql.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Deletes the book...")
-		params := mux.Vars(r)
-		id := params["id"]
+func (c Controller) DeleteBook(db *sql.DB, id string) int64 {
+	repo := repo.Repo{}
+	rowsDeleted := repo.DeletesBook(db, id)
+	return rowsDeleted
 
-		repo := repo.Repo{}
-		rowsDeleted := repo.DeletesBook(db, id)
-		json.NewEncoder(w).Encode(rowsDeleted)
-
-	}
 }
