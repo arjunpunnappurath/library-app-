@@ -22,48 +22,24 @@ func logFatal(err error) {
 	}
 }
 
-func (c Controller) ViewBooks(db *sql.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Displays the books...")
-		repo := repo.Repo{}
-		books := repo.ViewAllBooks(db)
-		json.NewEncoder(w).Encode(books)
-	}
+func (c Controller) ViewBooks(db *sql.DB) []models.Book {
+	repo := repo.Repo{}
+	books := repo.ViewAllBooks(db)
+	return books
 }
 
-func (c Controller) ViewBook(db *sql.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Displays the specific book...")
-		//var book models.Book
-		params := mux.Vars(r)
-		id := params["id"]
-
-		fmt.Println(id)
-
-		repo := repo.Repo{}
-		book := repo.ViewSingleBook(db, id)
-		// rows := db.QueryRow("select * from books where id = $1", params["id"])
-
-		// err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Year)
-		// logFatal(err)
-
-		// json.NewEncoder(w).Encode(book)
-		json.NewEncoder(w).Encode(book)
-	}
+func (c Controller) ViewBook(db *sql.DB, id string) models.Book {
+	fmt.Println(id)
+	repo := repo.Repo{}
+	book := repo.ViewSingleBook(db, id)
+	return book
 }
 
-func (c Controller) AddBook(db *sql.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("adds a book...")
-		var book models.Book
+func (c Controller) AddBook(book models.Book, db *sql.DB) int {
+	repo := repo.Repo{}
+	bookID := repo.AddBook(db, book)
 
-		json.NewDecoder(r.Body).Decode(&book)
-
-		repo := repo.Repo{}
-		bookID := repo.AddBook(db, book)
-
-		json.NewEncoder(w).Encode(bookID)
-	}
+	return bookID
 }
 
 func (c Controller) UpdateBook(db *sql.DB) http.HandlerFunc {

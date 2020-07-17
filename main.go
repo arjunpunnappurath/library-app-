@@ -1,6 +1,7 @@
 package main
 
 import (
+	"arjun/library/apis"
 	"arjun/library/controllers"
 	"arjun/library/driver"
 	"arjun/library/models"
@@ -32,10 +33,11 @@ func main() {
 	router := mux.NewRouter()
 
 	controller := controllers.Controller{}
+	api := apis.BookApi{}
 
-	router.HandleFunc("/books", controller.ViewBooks(db)).Methods("GET")
-	router.HandleFunc("/books/{id}", controller.ViewBook(db)).Methods("GET")
-	router.HandleFunc("/books", controller.AddBook(db)).Methods("POST")
+	router.HandleFunc("/books", api.ViewAllBooks(db)).Methods("GET")
+	router.HandleFunc("/books/{id}", api.ViewABook(db)).Methods("GET")
+	router.HandleFunc("/books", api.AddBook(db)).Methods("POST")
 	router.HandleFunc("/books", controller.UpdateBook(db)).Methods("PUT")
 	router.HandleFunc("/books/{id}", controller.DeleteBook(db)).Methods("DELETE")
 
