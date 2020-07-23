@@ -32,12 +32,17 @@ func main() {
 	router := mux.NewRouter()
 
 	api := apis.BookApi{}
+	userapi := apis.UserApis{}
 
 	router.HandleFunc("/books", api.ViewAllBooks(db)).Methods("GET")
 	router.HandleFunc("/books/{id}", api.ViewABook(db)).Methods("GET")
 	router.HandleFunc("/books", api.AddBook(db)).Methods("POST")
 	router.HandleFunc("/books", api.UpdateBook(db)).Methods("PUT")
 	router.HandleFunc("/books/{id}", api.DeleteBook(db)).Methods("DELETE")
+
+	router.HandleFunc("/users", userapi.ViewUsers(db)).Methods("GET")
+	router.HandleFunc("/users", userapi.AddUser(db)).Methods("POST")
+	router.HandleFunc("/users/{id}", userapi.DeleteUser(db)).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":8000", router))
 }
