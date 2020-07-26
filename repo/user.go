@@ -3,6 +3,7 @@ package repo
 import (
 	"arjun/library/models"
 	"database/sql"
+	"log"
 )
 
 func (r *Repo) ViewUsers(db *sql.DB) []models.User {
@@ -39,4 +40,25 @@ func (r *Repo) DeleteUser(db *sql.DB, id string) int64 {
 	logFatal(err)
 
 	return rowsDeleted
+}
+
+func (r *Repo) Login(db *sql.DB, creds models.Creds) (bool, error) {
+	rows, err := db.Query("select count(*) from users where username = $1 and password = $2",
+		creds.User, creds.Pass)
+	logFatal(err)
+
+	defer rows.Close()
+
+	var count int
+	for rows.Next() {
+		if err := rows.Scan(&count); err != nil {
+			log.Println("Error : ", err)
+		}
+	}
+
+	if count > 0 {
+		return true, nil
+	} else {
+		return false, err
+	}
 }

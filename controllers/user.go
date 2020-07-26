@@ -23,3 +23,13 @@ func (c *Controller) DeleteUser(db *sql.DB, id string) int64 {
 	rowsDeleted := repo.DeleteUser(db, id)
 	return rowsDeleted
 }
+
+func (c *Controller) Login(db *sql.DB, creds models.Creds) (bool, error) {
+	repo := repo.Repo{}
+	result, err := repo.Login(db, creds)
+	if err != nil {
+		return false, err
+	} else {
+		return result, nil
+	}
+}

@@ -43,6 +43,7 @@ func main() {
 	router.HandleFunc("/users", userapi.ViewUsers(db)).Methods("GET")
 	router.HandleFunc("/users", userapi.AddUser(db)).Methods("POST")
 	router.HandleFunc("/users/{id}", userapi.DeleteUser(db)).Methods("DELETE")
+	router.HandleFunc("/login", userapi.Login(db)).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8000", router))
 }
